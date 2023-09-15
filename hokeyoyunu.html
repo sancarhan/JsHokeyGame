@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Buz Hokeyi</title>
+     <style>
+        .oyun{
+            margin-left: 650px;
+        }
+        #game-board {
+            width: 400px;
+            height: 200px;
+            background-color: #000000;
+            position: relative;
+            text-align: center;
+        }
+
+        #paddle-left, #paddle-right {
+            width: 10px;
+            height: 60px;
+            background-color: #838383;
+            position: absolute;
+        }
+
+        #paddle-left {
+            left: 0;
+        }
+
+        #paddle-right {
+            right: 0;
+        }
+
+        #ball {
+            width: 10px;
+            height: 10px;
+            background-color: #fff;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Mini Buz Hokeyi</h1>
+    <p style="text-align: center;">Oyuncu 1 Skor: <span id="score-left">0</span></p>
+    <p style="text-align: center;">Oyuncu 2 Skor: <span id="score-right">0</span></p>
+    <div class="oyun">
+        <div id="game-board">
+            <div id="paddle-left"></div>
+            <div id="paddle-right"></div>
+            <div id="ball"></div>
+        </div>
+    </div>
+
+    <script>
+        let scoreLeft = 0;
+        let scoreRight = 0;
+        const maxScore = 10;
+        const paddleSpeed = 5;
+        const ballSpeedX = 5;
+        const ballSpeedY = 2;
+
+        let ballX = 200;
+        let ballY = 100;
+        let ballSpeedXDirection = 1;
+        let ballSpeedYDirection = 1;
+
+        let paddleLeftY = 70;
+        let paddleRightY = 70;
+
+        const paddleLeft = document.getElementById('paddle-left');
+        const paddleRight = document.getElementById('paddle-right');
+        const ball = document.getElementById('ball');
+        const scoreLeftElement = document.getElementById('score-left');
+        const scoreRightElement = document.getElementById('score-right');
+
+        function gameLoop() {
+            if (paddleLeftY < 0) paddleLeftY = 0;
+            if (paddleLeftY > 140) paddleLeftY = 140;
+            if (paddleRightY < 0) paddleRightY = 0;
+            if (paddleRightY > 140) paddleRightY = 140;
+
+            ballX += ballSpeedX * ballSpeedXDirection;
+            ballY += ballSpeedY * ballSpeedYDirection;
+
+            if (ballY <= 0 || ballY >= 190) ballSpeedYDirection *= -1;
+
+            if (ballX <= 10 && ballY >= paddleLeftY && ballY <= paddleLeftY + 60) ballSpeedXDirection *= -1;
+
+            if (ballX >= 380 && ballY >= paddleRightY && ballY <= paddleRightY + 60) ballSpeedXDirection *= -1;
+
+            if (ballX < 0) {
+                scoreRight++;
+                resetGame();
+            }
+
+            if (ballX > 400) {
+                scoreLeft++;
+                resetGame();
+            }
+
+            scoreLeftElement.innerText = scoreLeft;
+            scoreRightElement.innerText = scoreRight;
+
+            paddleLeft.style.top = `${paddleLeftY}px`;
+            paddleRight.style.top = `${paddleRightY}px`;
+
+            ball.style.left = `${ballX}px`;
+            ball.style.top = `${ballY}px`;
+
+            if (scoreLeft >= maxScore || scoreRight >= maxScore) {
+                alert('Oyun bitti!');
+                resetGame();
+            } else {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Oyuncu 1'i kontrol etmek için klavye tuşları
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                paddleLeftY -= paddleSpeed;
+            }
+            if (event.key === 'ArrowDown') {
+                paddleLeftY += paddleSpeed;
+            }
+        });
+
+        // Oyuncu 2'yi kontrol etmek için klavye tuşları
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'w') {
+                paddleRightY -= paddleSpeed;
+            }
+            if (event.key === 's') {
+                paddleRightY += paddleSpeed;
+            }
+        });
+
+        function resetGame() {
+            ballX = 200;
+            ballY = 100;
+            ballSpeedXDirection = 1;
+            ballSpeedYDirection = 1;
+            paddleLeftY = 70;
+            paddleRightY = 70;
+
+            if (scoreLeft >= maxScore || scoreRight >= maxScore) {
+                scoreLeft = 0;
+                scoreRight = 0;
+            }
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
